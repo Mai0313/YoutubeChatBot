@@ -68,7 +68,12 @@ authors = [
     { name = "Wei", email = "mai@mai0313.com" },
 ]
 dependencies = [
+    "google-api-python-client>=2.177.0",
+    "google-auth>=2.40.3",
+    "google-auth-oauthlib>=1.2.2",
     "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.1.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
