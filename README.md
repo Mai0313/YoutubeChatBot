@@ -1,8 +1,7 @@
 <center>
 
-# Python Project Template
+# YouTube Chat Bot
 
-[![PyPI version](https://img.shields.io/pypi/v/swebenchv2.svg)](https://pypi.org/project/swebenchv2/)
 [![python](https://img.shields.io/badge/-Python_3.10_%7C_3.11_%7C_3.12-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![uv](https://img.shields.io/badge/-uv_dependency_management-2C5F2D?logo=python&logoColor=white)](https://docs.astral.sh/uv/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -14,95 +13,108 @@
 
 </center>
 
-🚀 **A comprehensive Python project template to kickstart your development with complete CI/CD pipelines and modern tooling**
+🤖 **A powerful YouTube live chat bot that can monitor live stream chat messages and automatically respond to viewers**
 
-Click on [<kbd>Use this template</kbd>](https://github.com/Mai0313/youtubechatbot/generate) to initialize a new repository, or use our initialization script for a personalized setup.
+Monitor YouTube live streams, analyze chat messages in real-time, and engage with your audience through automated responses.
 
-**Other Languages**: [English](README.md) | [中文](README_cn.md)
+**Other Languages**: [English](README.md) | [繁體中文](README_cn.md)
 
 ## ✨ Features
 
-### 🏗️ **Modern Project Structure**
+### � **Live Chat Monitoring**
 
-- **src/ layout**: Following Python packaging best practices
-- **uv dependency management**: Fast, reliable, and modern dependency resolution
-- **Multi-version support**: Python 3.10, 3.11, and 3.12
-- **Type hints**: Full type annotation support with validation
+- **Real-time chat tracking**: Monitor YouTube live stream chat messages as they appear
+- **Multiple stream support**: Connect to different YouTube live streams
+- **Message filtering**: Filter and process specific types of messages
+- **Author identification**: Track message authors and their details
 
-### 🔧 **Development Environment**
+### 🤖 **Automated Response System**
 
-- **VS Code Dev Container**: Fully configured with zsh, oh-my-zsh, and powerlevel10k theme
-- **Docker support**: Multi-stage Dockerfile for development and production
-- **Pre-commit hooks**: Automated code formatting and linting with ruff
-- **Local development**: Easy setup with Make commands
+- **Smart replies**: Send automated responses to chat messages
+- **OAuth authentication**: Secure authentication with YouTube API
+- **Custom message templates**: Create personalized response templates
+- **Rate limiting**: Respect YouTube API rate limits
 
-### 🧪 **Testing & Quality Assurance**
+### � **Easy Configuration**
 
-- **pytest framework**: Comprehensive testing with coverage reporting
-- **Parallel execution**: Faster test runs with pytest-xdist
-- **Code coverage**: HTML and XML reports with configurable thresholds
-- **Quality gates**: Automated code quality checks on every commit
+- **Environment variables**: Simple setup with `.env` file
+- **YouTube Data API**: Integration with YouTube Data API v3
+- **OpenAI integration**: Ready for AI-powered responses (future feature)
+- **Command-line interface**: Easy-to-use CLI for quick setup
 
-### 🚀 **Complete CI/CD Pipeline**
+### 🛡️ **Modern Development**
 
-- **Multi-version testing**: Automated testing across Python versions
-- **Code quality checks**: ruff linting and formatting validation
-- **Documentation deployment**: Automatic GitHub Pages deployment
-- **Release automation**: Semantic versioning and release drafting
-- **Auto-labeling**: Intelligent PR categorization
-
-### 📚 **Documentation**
-
-- **MkDocs Material**: Beautiful, responsive documentation
-- **Auto-generation**: Scripts to generate docs from code and notebooks
-- **API documentation**: Automatic API reference generation
-- **Blog support**: Built-in blog functionality for project updates
-
-### 🤖 **Automation Scripts**
-
-- **Project initialization**: `scripts/initpyrepo.go` for creating personalized projects
-- **Documentation generation**: `scripts/gen_docs.py` for auto-generating documentation
-- **Makefile commands**: Common development tasks automated
+- **Type safety**: Full type hints with Pydantic models
+- **Error handling**: Robust error handling and logging
+- **Testing support**: Comprehensive testing framework
+- **Code quality**: Pre-commit hooks and code formatting
 
 ## 🚀 Quick Start
 
-### Option 1: Use GitHub Template
+### Prerequisites
 
-1. Click [<kbd>Use this template</kbd>](https://github.com/Mai0313/youtubechatbot/generate)
-2. Configure your new repository
-3. Clone and start developing
+1. **YouTube Data API Key**: Get your API key from [Google Cloud Console](https://console.cloud.google.com/)
+2. **OAuth 2.0 Credentials**: Download `client_secret.json` for chat posting functionality
+3. **Python 3.10+**: Make sure you have Python 3.10 or later installed
 
-### Option 2: Use Initialization Script
+### Installation
 
-1. Clone this repository
-2. Run the initialization script:
+1. **Clone the repository**:
+
     ```bash
-    go run scripts/initpyrepo.go
+    git clone https://github.com/Mai0313/youtubechatbot.git
+    cd youtubechatbot
     ```
-3. Follow the prompts to customize your project
 
-### Option 3: Manual Setup
+2. **Install dependencies**:
 
-1. Clone the repository
-2. Install dependencies:
     ```bash
     make uv-install  # Install uv if not already installed
     uv sync          # Install project dependencies
     ```
-3. Set up pre-commit hooks:
+
+3. **Set up environment variables**:
+
     ```bash
-    make format      # Run pre-commit hooks
+    cp .env.example .env
+    # Edit .env file with your API keys
     ```
 
-### Option 4: Quick Customization (Recommended)
+4. **Configure OAuth (for sending messages)**:
 
-1. Clone this repository
-2. Globally replace `youtubechatbot` with your project name (snake_case format)
-3. Globally replace `YoutubeChatBot` with your project title (PascalCase format)
-4. Run initial setup:
-    ```bash
-    make uv-install && uv sync && make format
-    ```
+    - Download `client_secret.json` from Google Cloud Console
+    - Place it in the project root directory
+
+### Basic Usage
+
+#### Monitor Live Chat Messages
+
+```python
+from youtubechatbot import YoutubeStream
+
+# Create a stream instance
+stream = YoutubeStream(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
+
+# Start monitoring chat messages
+stream.get_chat_messages()
+```
+
+#### Send Messages to Chat
+
+```python
+# Reply to the chat
+stream.reply_to_chat("Hello everyone! 👋")
+```
+
+#### Command Line Usage
+
+```bash
+# Monitor a specific live stream
+python -m youtubechatbot monitor --url "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+
+# Send a message to the chat
+python -m youtubechatbot reply --url "https://www.youtube.com/watch?v=YOUR_VIDEO_ID" --message "Hello!"
+```
 
 ## 📁 Project Structure
 
@@ -115,12 +127,44 @@ Click on [<kbd>Use this template</kbd>](https://github.com/Mai0313/youtubechatbo
 ├── docs/                   # MkDocs documentation
 ├── scripts/                # Automation scripts
 ├── src/
-│   └── youtubechatbot/      # Main package
+│   └── youtubechatbot/     # Main bot package
+│       ├── __init__.py
+│       └── cli.py          # Core bot functionality
 ├── tests/                  # Test suite
+├── client_secret.json      # OAuth credentials (not in repo)
+├── .env                    # Environment variables (not in repo)
 ├── pyproject.toml          # Project configuration
 ├── Makefile               # Development commands
 └── README.md
 ```
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+YOUTUBE_DATA_API_KEY=your_youtube_data_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here  # Optional, for future AI features
+```
+
+### OAuth Setup for Sending Messages
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable YouTube Data API v3
+4. Create OAuth 2.0 credentials
+5. Download the JSON file and rename it to `client_secret.json`
+6. Place it in the project root directory
+
+### API Rate Limits
+
+- **YouTube Data API**: 10,000 units per day (default)
+- **Chat messages**: ~1 unit per message retrieved
+- **Sending messages**: ~50 units per message sent
+
+Monitor your usage in Google Cloud Console to avoid hitting limits.
 
 ## 🛠️ Available Commands
 
@@ -135,62 +179,131 @@ make gen-docs       # Generate documentation
 make uv-install     # Install uv dependency manager
 uv add <package>    # Add production dependency
 uv add <package> --dev  # Add development dependency
+
+# Bot Usage
+python -m youtubechatbot monitor --url <youtube_url>     # Monitor chat
+python -m youtubechatbot reply --url <youtube_url> --message <text>  # Send message
 ```
 
-## 🎯 What's Included
+## 🔧 Advanced Usage
 
-### CI/CD Workflows
+### Custom Message Processing
 
-- **Testing**: Multi-version Python testing on PRs
-- **Code Quality**: Automated ruff checks and pre-commit validation
-- **Documentation**: Automatic GitHub Pages deployment
-- **Release**: Automated release drafting and changelog generation
-- **Labeling**: Auto-labeling based on PR content
+```python
+from youtubechatbot import YoutubeStream
 
-### Development Tools
 
-- **ruff**: Fast Python linter and formatter
-- **pytest**: Testing framework with coverage
-- **pre-commit**: Git hooks for code quality
-- **MkDocs**: Documentation generation
-- **Docker**: Containerized development and deployment
+class CustomChatBot(YoutubeStream):
+    def process_message(self, author: str, message: str) -> None:
+        """Custom message processing logic"""
+        if "hello" in message.lower():
+            self.reply_to_chat(f"Hello {author}! 👋")
+        elif "help" in message.lower():
+            self.reply_to_chat("Available commands: !help, !info, !time")
 
-### Project Templates
 
-- **Python package**: Ready-to-use package structure
-- **Configuration files**: All necessary config files included
-- **Documentation**: Complete documentation setup
-- **Testing**: Comprehensive test configuration
-
-## 🎨 Customization Guide
-
-### Project Name Customization
-
-This template is designed for quick customization through simple global replacements:
-
-1. **Replace package name**: Change all instances of `youtubechatbot` to your project name (recommended: snake_case)
-2. **Replace project title**: Change all instances of `YoutubeChatBot` to your project title (recommended: PascalCase)
-3. **Update metadata**: Modify author, description, and other details in `pyproject.toml`
-
-Example:
-
-```bash
-# If your project is called "awesome_project"
-find . -type f -name "*.py" -o -name "*.md" -o -name "*.toml" | xargs sed -i 's/youtubechatbot/awesome_project/g'
-find . -type f -name "*.py" -o -name "*.md" -o -name "*.toml" | xargs sed -i 's/YoutubeChatBot/AwesomeProject/g'
+# Use your custom bot
+bot = CustomChatBot(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
+bot.get_chat_messages()
 ```
+
+### Integration with AI Services
+
+```python
+import openai
+from youtubechatbot import YoutubeStream
+
+
+class AIChatBot(YoutubeStream):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        openai.api_key = self.openai_api_key
+
+    def generate_ai_response(self, message: str) -> str:
+        """Generate AI response using OpenAI"""
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo", messages=[{"role": "user", "content": message}]
+        )
+        return response.choices[0].message.content
+```
+
+## 🎯 Use Cases
+
+### Content Creator Engagement
+
+- **Auto-greetings**: Welcome new viewers automatically
+- **FAQ responses**: Answer common questions instantly
+- **Moderation**: Filter and respond to inappropriate content
+- **Stream interaction**: Create interactive games and polls
+
+### Business Applications
+
+- **Customer support**: Provide instant responses during live events
+- **Product launches**: Engage with audience during announcements
+- **Educational content**: Answer student questions during live classes
+- **Community building**: Foster engagement in live communities
+
+## 📊 Monitoring and Analytics
+
+The bot provides real-time insights into your live chat:
+
+- Message frequency and patterns
+- Active user engagement
+- Response rates to automated messages
+- Popular topics and keywords
+
+## 🔒 Security and Privacy
+
+- **OAuth 2.0**: Secure authentication with YouTube
+- **API key management**: Environment-based credential storage
+- **Rate limiting**: Respects YouTube API quotas
+- **Error handling**: Graceful handling of API failures
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Bot not receiving messages:**
+
+- Verify the YouTube URL is for a live stream
+- Check if the stream has chat enabled
+- Ensure your API key has proper permissions
+
+**Cannot send messages:**
+
+- Verify `client_secret.json` is properly configured
+- Check OAuth permissions include chat posting
+- Ensure the bot account can post in the chat
+
+**API quota exceeded:**
+
+- Monitor your API usage in Google Cloud Console
+- Implement message batching for high-volume streams
+- Consider upgrading your API quota if needed
 
 ## 🤝 Contributing
 
 We welcome contributions! Please feel free to:
 
-- Open issues for bugs or feature requests
-- Submit pull requests for improvements
-- Share your experience using this template
+- **Report bugs**: Open issues for any problems you encounter
+- **Request features**: Suggest new functionality for the bot
+- **Submit improvements**: Create pull requests for enhancements
+- **Share use cases**: Tell us how you're using the bot
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and add tests
+4. Run tests: `make test`
+5. Format code: `make format`
+6. Commit changes: `git commit -m 'Add amazing feature'`
+7. Push to branch: `git push origin feature/amazing-feature`
+8. Open a Pull Request
 
 ## 📖 Documentation
 
-For detailed documentation, visit: [https://mai0313.github.io/youtubechatbot/](https://mai0313.github.io/youtubechatbot/)
+For detailed documentation and API reference, visit: [https://mai0313.github.io/youtubechatbot/](https://mai0313.github.io/youtubechatbot/)
 
 ## 👥 Contributors
 
@@ -201,3 +314,7 @@ Made with [contrib.rocks](https://contrib.rocks)
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Happy streaming! 🎥✨**

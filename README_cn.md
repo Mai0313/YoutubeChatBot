@@ -1,8 +1,7 @@
 <center>
 
-# Python 專案模板
+# YouTube 聊天室機器人
 
-[![PyPI version](https://img.shields.io/pypi/v/swebenchv2.svg)](https://pypi.org/project/swebenchv2/)
 [![python](https://img.shields.io/badge/-Python_3.10_%7C_3.11_%7C_3.12-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![uv](https://img.shields.io/badge/-uv_dependency_management-2C5F2D?logo=python&logoColor=white)](https://docs.astral.sh/uv/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -14,95 +13,108 @@
 
 </center>
 
-🚀 **一個完整的 Python 專案模板，幫助開發者快速啟動專案，內含完整的 CI/CD 流水線和現代化工具**
+🤖 **功能強大的 YouTube 直播聊天室機器人，可以監控直播聊天訊息並自動回覆觀眾**
 
-點擊 [<kbd>使用此模板</kbd>](https://github.com/Mai0313/youtubechatbot/generate) 來建立新的儲存庫，或使用我們的初始化腳本進行個人化設定。
+即時監控 YouTube 直播聊天室，分析聊天訊息，並透過自動回覆與您的觀眾互動。
 
-**其他語言版本**: [English](README.md) | [中文](README_cn.md)
+**其他語言版本**: [English](README.md) | [繁體中文](README_cn.md)
 
 ## ✨ 功能特色
 
-### 🏗️ **現代化專案結構**
+### � **即時聊天室監控**
 
-- **src/ 佈局**: 遵循 Python 封裝最佳實踐
-- **uv 依賴管理**: 快速、可靠的現代化依賴解析
-- **多版本支援**: Python 3.10、3.11 和 3.12
-- **型別提示**: 完整的型別註解支援與驗證
+- **即時聊天追蹤**: 即時監控 YouTube 直播聊天室訊息
+- **多直播支援**: 連接到不同的 YouTube 直播串流
+- **訊息過濾**: 過濾和處理特定類型的訊息
+- **用戶識別**: 追蹤訊息作者及其詳細資訊
 
-### 🔧 **開發環境**
+### 🤖 **自動回覆系統**
 
-- **VS Code Dev Container**: 完整配置，包含 zsh、oh-my-zsh 和 powerlevel10k 主題
-- **Docker 支援**: 開發和生產環境的多階段 Dockerfile
-- **Pre-commit hooks**: 使用 ruff 自動化程式碼格式化和檢查
-- **本地開發**: 使用 Make 命令輕鬆設定
+- **智慧回覆**: 自動回覆聊天室訊息
+- **OAuth 驗證**: 與 YouTube API 的安全驗證
+- **自訂訊息模板**: 建立個人化的回覆模板
+- **速率限制**: 遵守 YouTube API 速率限制
 
-### 🧪 **測試與品質保證**
+### � **簡易配置**
 
-- **pytest 框架**: 全面的測試與覆蓋率報告
-- **平行執行**: 使用 pytest-xdist 加速測試執行
-- **程式碼覆蓋率**: HTML 和 XML 報告，可配置閾值
-- **品質門檻**: 每次提交都自動進行程式碼品質檢查
+- **環境變數**: 使用 `.env` 檔案進行簡單設定
+- **YouTube Data API**: 整合 YouTube Data API v3
+- **OpenAI 整合**: 為 AI 驅動的回覆做好準備（未來功能）
+- **命令列介面**: 易於使用的 CLI 快速設定
 
-### 🚀 **完整 CI/CD 流水線**
+### �️ **現代化開發**
 
-- **多版本測試**: 跨 Python 版本的自動化測試
-- **程式碼品質檢查**: ruff 檢查和格式化驗證
-- **文檔部署**: 自動 GitHub Pages 部署
-- **發布自動化**: 語義化版本控制和發布草稿
-- **自動標籤**: 智能 PR 分類
-
-### 📚 **文檔系統**
-
-- **MkDocs Material**: 美觀且響應式的文檔
-- **自動生成**: 從程式碼和筆記本自動生成文檔的腳本
-- **API 文檔**: 自動 API 參考生成
-- **部落格支援**: 內建專案更新部落格功能
-
-### 🤖 **自動化腳本**
-
-- **專案初始化**: `scripts/initpyrepo.go` 用於建立個人化專案
-- **文檔生成**: `scripts/gen_docs.py` 用於自動生成文檔
-- **Makefile 命令**: 常見開發任務自動化
+- **類型安全**: 使用 Pydantic 模型的完整類型提示
+- **錯誤處理**: 強大的錯誤處理和日誌記錄
+- **測試支援**: 完整的測試框架
+- **程式碼品質**: Pre-commit hooks 和程式碼格式化
 
 ## 🚀 快速開始
 
-### 選項 1: 使用 GitHub 模板
+### 預備條件
 
-1. 點擊 [<kbd>使用此模板</kbd>](https://github.com/Mai0313/youtubechatbot/generate)
-2. 配置您的新儲存庫
-3. 複製並開始開發
+1. **YouTube Data API 金鑰**: 從 [Google Cloud Console](https://console.cloud.google.com/) 取得您的 API 金鑰
+2. **OAuth 2.0 憑證**: 下載 `client_secret.json` 以使用聊天室發訊功能
+3. **Python 3.10+**: 確保您安裝了 Python 3.10 或更新版本
 
-### 選項 2: 使用初始化腳本
+### 安裝步驟
 
-1. 複製此儲存庫
-2. 執行初始化腳本：
+1. **複製儲存庫**:
+
     ```bash
-    go run scripts/initpyrepo.go
+    git clone https://github.com/Mai0313/youtubechatbot.git
+    cd youtubechatbot
     ```
-3. 依照提示自訂您的專案
 
-### 選項 3: 手動設定
+2. **安裝依賴套件**:
 
-1. 複製儲存庫
-2. 安裝依賴：
     ```bash
     make uv-install  # 如果尚未安裝 uv
     uv sync          # 安裝專案依賴
     ```
-3. 設定 pre-commit hooks：
+
+3. **設定環境變數**:
+
     ```bash
-    make format      # 執行 pre-commit hooks
+    cp .env.example .env
+    # 編輯 .env 檔案，加入您的 API 金鑰
     ```
 
-### 選項 4: 快速自訂（推薦）
+4. **配置 OAuth（用於發送訊息）**:
 
-1. 複製此儲存庫
-2. 全局替換 `youtubechatbot` 為您的專案名稱（snake_case 格式）
-3. 全局替換 `YoutubeChatBot` 為您的專案標題（PascalCase 格式）
-4. 執行初始設定：
-    ```bash
-    make uv-install && uv sync && make format
-    ```
+    - 從 Google Cloud Console 下載 `client_secret.json`
+    - 將檔案放在專案根目錄
+
+### 基本使用方式
+
+#### 監控直播聊天室訊息
+
+```python
+from youtubechatbot import YoutubeStream
+
+# 建立串流實例
+stream = YoutubeStream(url="https://www.youtube.com/watch?v=您的影片ID")
+
+# 開始監控聊天室訊息
+stream.get_chat_messages()
+```
+
+#### 發送訊息到聊天室
+
+```python
+# 回覆聊天室
+stream.reply_to_chat("大家好！ 👋")
+```
+
+#### 命令列使用方式
+
+```bash
+# 監控特定直播串流
+python -m youtubechatbot monitor --url "https://www.youtube.com/watch?v=您的影片ID"
+
+# 發送訊息到聊天室
+python -m youtubechatbot reply --url "https://www.youtube.com/watch?v=您的影片ID" --message "哈囉！"
+```
 
 ## 📁 專案結構
 
@@ -115,17 +127,49 @@
 ├── docs/                   # MkDocs 文檔
 ├── scripts/                # 自動化腳本
 ├── src/
-│   └── youtubechatbot/      # 主要套件
+│   └── youtubechatbot/     # 主要機器人套件
+│       ├── __init__.py
+│       └── cli.py          # 核心機器人功能
 ├── tests/                  # 測試套件
+├── client_secret.json      # OAuth 憑證（不在儲存庫中）
+├── .env                    # 環境變數（不在儲存庫中）
 ├── pyproject.toml          # 專案配置
 ├── Makefile               # 開發命令
 └── README.md
 ```
 
+## ⚙️ 配置設定
+
+### 環境變數
+
+在專案根目錄建立 `.env` 檔案：
+
+```env
+YOUTUBE_DATA_API_KEY=您的youtube_data_api金鑰
+OPENAI_API_KEY=您的openai_api金鑰  # 可選，用於未來的 AI 功能
+```
+
+### OAuth 設定用於發送訊息
+
+1. 前往 [Google Cloud Console](https://console.cloud.google.com/)
+2. 建立新專案或選擇現有專案
+3. 啟用 YouTube Data API v3
+4. 建立 OAuth 2.0 憑證
+5. 下載 JSON 檔案並重新命名為 `client_secret.json`
+6. 將檔案放在專案根目錄
+
+### API 速率限制
+
+- **YouTube Data API**: 每日 10,000 單位（預設）
+- **聊天訊息**: 每則訊息約 1 個單位
+- **發送訊息**: 每則訊息約 50 個單位
+
+在 Google Cloud Console 監控您的使用量以避免達到限制。
+
 ## 🛠️ 可用命令
 
 ```bash
-# 開發
+# 開發相關
 make clean          # 清理自動生成的檔案
 make format         # 執行 pre-commit hooks
 make test           # 執行所有測試
@@ -133,64 +177,133 @@ make gen-docs       # 生成文檔
 
 # 依賴管理
 make uv-install     # 安裝 uv 依賴管理器
-uv add <package>    # 添加生產依賴
-uv add <package> --dev  # 添加開發依賴
+uv add <套件名稱>    # 添加生產依賴
+uv add <套件名稱> --dev  # 添加開發依賴
+
+# 機器人使用
+python -m youtubechatbot monitor --url <youtube網址>     # 監控聊天室
+python -m youtubechatbot reply --url <youtube網址> --message <訊息內容>  # 發送訊息
 ```
 
-## 🎯 包含內容
+## 🔧 進階使用
 
-### CI/CD 工作流程
+### 自訂訊息處理
 
-- **測試**: PR 上的多版本 Python 測試
-- **程式碼品質**: 自動化 ruff 檢查和 pre-commit 驗證
-- **文檔**: 自動 GitHub Pages 部署
-- **發布**: 自動發布草稿和變更日誌生成
-- **標籤**: 基於 PR 內容的自動標籤
+```python
+from youtubechatbot import YoutubeStream
 
-### 開發工具
 
-- **ruff**: 快速 Python 檢查器和格式化器
-- **pytest**: 帶覆蓋率的測試框架
-- **pre-commit**: 程式碼品質的 Git hooks
-- **MkDocs**: 文檔生成
-- **Docker**: 容器化開發和部署
+class CustomChatBot(YoutubeStream):
+    def process_message(self, author: str, message: str) -> None:
+        """自訂訊息處理邏輯"""
+        if "你好" in message or "hello" in message.lower():
+            self.reply_to_chat(f"哈囉 {author}！ 👋")
+        elif "幫助" in message or "help" in message.lower():
+            self.reply_to_chat("可用指令：!help, !info, !time")
 
-### 專案模板
 
-- **Python 套件**: 即用型套件結構
-- **配置檔案**: 包含所有必要的配置檔案
-- **文檔**: 完整的文檔設定
-- **測試**: 全面的測試配置
-
-## 🎨 自訂指南
-
-### 專案名稱自訂
-
-本模板設計為可透過簡單的全局替換快速自訂：
-
-1. **替換套件名稱**: 將所有 `youtubechatbot` 替換為您的專案名稱（建議使用 snake_case）
-2. **替換專案標題**: 將所有 `YoutubeChatBot` 替換為您的專案標題（建議使用 PascalCase）
-3. **更新中繼資料**: 修改 `pyproject.toml` 中的作者、描述等資訊
-
-範例：
-
-```bash
-# 如果您的專案叫做 "awesome_project"
-find . -type f -name "*.py" -o -name "*.md" -o -name "*.toml" | xargs sed -i 's/youtubechatbot/awesome_project/g'
-find . -type f -name "*.py" -o -name "*.md" -o -name "*.toml" | xargs sed -i 's/YoutubeChatBot/AwesomeProject/g'
+# 使用您的自訂機器人
+bot = CustomChatBot(url="https://www.youtube.com/watch?v=您的影片ID")
+bot.get_chat_messages()
 ```
+
+### 與 AI 服務整合
+
+```python
+import openai
+from youtubechatbot import YoutubeStream
+
+
+class AIChatBot(YoutubeStream):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        openai.api_key = self.openai_api_key
+
+    def generate_ai_response(self, message: str) -> str:
+        """使用 OpenAI 產生 AI 回覆"""
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo", messages=[{"role": "user", "content": message}]
+        )
+        return response.choices[0].message.content
+```
+
+## 🎯 使用案例
+
+### 內容創作者互動
+
+- **自動問候**: 自動歡迎新觀眾
+- **FAQ 回應**: 即時回答常見問題
+- **內容管理**: 過濾並回應不當內容
+- **串流互動**: 建立互動遊戲和投票
+
+### 商業應用
+
+- **客戶支援**: 在直播活動中提供即時回應
+- **產品發表**: 在產品發表會期間與觀眾互動
+- **教育內容**: 在直播課程中回答學生問題
+- **社群建設**: 在直播社群中促進參與
+
+## 📊 監控與分析
+
+機器人提供即時的直播聊天室洞察：
+
+- 訊息頻率和模式
+- 活躍用戶參與度
+- 自動訊息回應率
+- 熱門話題和關鍵字
+
+## 🔒 安全性與隱私
+
+- **OAuth 2.0**: 與 YouTube 的安全驗證
+- **API 金鑰管理**: 基於環境變數的憑證儲存
+- **速率限制**: 遵守 YouTube API 配額
+- **錯誤處理**: 優雅處理 API 故障
+
+## 🚨 疑難排解
+
+### 常見問題
+
+**機器人無法接收訊息:**
+
+- 確認 YouTube 網址是直播串流
+- 檢查串流是否啟用聊天室
+- 確保您的 API 金鑰有適當權限
+
+**無法發送訊息:**
+
+- 確認 `client_secret.json` 正確配置
+- 檢查 OAuth 權限包含聊天室發文權限
+- 確保機器人帳戶可以在聊天室發文
+
+**API 配額超出:**
+
+- 在 Google Cloud Console 監控您的 API 使用量
+- 為高流量串流實作訊息批次處理
+- 如需要可考慮升級您的 API 配額
 
 ## 🤝 貢獻
 
 我們歡迎貢獻！請隨時：
 
-- 開啟問題回報錯誤或功能請求
-- 提交拉取請求進行改進
-- 分享您使用此模板的經驗
+- **回報錯誤**: 為您遇到的任何問題開啟 issue
+- **請求功能**: 為機器人建議新功能
+- **提交改進**: 為增強功能建立 pull requests
+- **分享使用案例**: 告訴我們您如何使用機器人
+
+### 開發設定
+
+1. Fork 此儲存庫
+2. 建立功能分支: `git checkout -b feature/amazing-feature`
+3. 進行變更並添加測試
+4. 執行測試: `make test`
+5. 格式化程式碼: `make format`
+6. 提交變更: `git commit -m 'Add amazing feature'`
+7. 推送到分支: `git push origin feature/amazing-feature`
+8. 開啟 Pull Request
 
 ## 📖 文檔
 
-詳細文檔請訪問：[https://mai0313.github.io/youtubechatbot/](https://mai0313.github.io/youtubechatbot/)
+詳細文檔和 API 參考，請訪問：[https://mai0313.github.io/youtubechatbot/](https://mai0313.github.io/youtubechatbot/)
 
 ## 👥 貢獻者
 
@@ -201,3 +314,7 @@ Made with [contrib.rocks](https://contrib.rocks)
 ## 📄 授權
 
 本專案採用 MIT 授權 - 詳見 [LICENSE](LICENSE) 檔案。
+
+---
+
+**祝您直播愉快！ 🎥✨**

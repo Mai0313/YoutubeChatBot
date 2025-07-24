@@ -4,48 +4,220 @@
 
 # Project Background
 
-This is a pre-configured Python project template designed to streamline the development process. It includes essential tools and configurations for modern Python development, such as dependency management, code formatting, linting, testing, and documentation.
-Everything in this file SHOULD BE MODIFIED to reflect the current state of the project.
+This is a YouTube live chat bot that monitors YouTube live stream chat messages in real-time and automatically responds to viewers. The bot is built using Python with the YouTube Data API v3 and supports OAuth authentication for sending messages to live chat.
 
-# Core Infrastructure
+The main functionality includes:
 
-- **Modern Python**: Supports Python 3.10, 3.11, and 3.12
-- **Dependency Management**: Uses `uv` for fast and reliable dependency management
-- **Project Structure**: src/ layout following Python packaging best practices
-- **Docker Support**: Multi-stage Dockerfile for development and production
-- **VS Code Dev Container**: Fully configured development environment with zsh, oh-my-zsh, and powerlevel10k
+- Monitoring live chat messages from YouTube streams
+- Extracting video IDs from YouTube URLs
+- Retrieving live chat IDs for active streams
+- Sending automated responses to chat messages
+- OAuth 2.0 authentication for chat posting
 
-# CI/CD Pipeline
+# Core Architecture
 
-- **Pre-commit Hooks**: You can run `pre-commit run -a` to apply all hooks.
-- **Github Action**: All actions you may need are defined in `.github/workflows/` directory.
+## Main Components
 
-# Coding Style
+### `YoutubeStream` Class (`src/youtubechatbot/cli.py`)
 
-- All rules are pre-defined by using `pre-commit run -a` command.
-- Follow PEP 8 naming conventions:
-    - snake_case for functions and variables
-    - PascalCase for classes
-    - UPPER_CASE for constants
-- Use pydantic model, and all pydantic models should include `Field`, and `description` should be included.
-- Use `pytest` for testing, and all tests should be placed in the `tests/` directory
+- **Purpose**: Main class handling YouTube live stream chat operations
+- **Inherits from**: `Config` (Pydantic BaseSettings)
+- **Key Methods**:
+    - `video_id`: Computed property to extract video ID from URL
+    - `get_chat_id()`: Retrieves the live chat ID from video
+    - `get_chat_messages()`: Continuously monitors chat messages
+    - `reply_to_chat(message: str)`: Sends messages to the chat
 
-# Type Hints / Documentation
+### Configuration Management
 
-- Use type hints for all function parameters and returns
-- Use `TypeVar` for generic types
-- Use `Protocol` for duck typing
-- Use Google-style docstrings
-- All documentation should be in English
-- Use proper inline comments for better mkdocs support
+- Uses Pydantic `BaseSettings` for environment variable management
+- Required environment variables:
+    - `YOUTUBE_DATA_API_KEY`: YouTube Data API v3 key
+    - `OPENAI_API_KEY`: OpenAI API key (for future AI features)
 
-# Dependencies
+## Dependencies
 
-- Use `uv` for dependency management
-- Separate dev dependencies by adding `--dev` flag when adding dependencies
-    - Production:
-        - Add Dependencies: `uv add <package>`
-        - Remove Dependencies: `uv remove <package>`
-    - Development:
-        - Add Dependencies: `uv add <package> --dev`
-        - Remove Dependencies: `uv remove <package> --dev`
+### Core Dependencies
+
+- **google-api-python-client**: YouTube Data API client
+- **google-auth-oauthlib**: OAuth 2.0 authentication
+- **pydantic**: Data validation and settings management
+- **pydantic-settings**: Settings management from environment variables
+- **rich**: Console output formatting
+- **python-dotenv**: Environment variable loading
+
+### Development Dependencies
+
+- **pytest**: Testing framework
+- **ruff**: Linting and code formatting
+- **pre-commit**: Git hooks for code quality
+- **uv**: Dependency management
+
+# Development Guidelines
+
+## Code Structure
+
+### File Organization
+
+```
+src/youtubechatbot/
+├── __init__.py          # Package initialization
+└── cli.py              # Main bot functionality and CLI
+```
+
+### Class Design Patterns
+
+- Use Pydantic models for all configuration and data structures
+- Implement computed properties with `@computed_field` for derived values
+- Follow dependency injection pattern for API clients
+- Use environment-based configuration with validation
+
+## API Integration
+
+### YouTube Data API v3 Usage
+
+- **Authentication**: API key for read operations, OAuth for write operations
+- **Endpoints Used**:
+    - `videos().list()`: Get live streaming details
+    - `liveChatMessages().list()`: Retrieve chat messages
+    - `liveChatMessages().insert()`: Send chat messages
+- **Rate Limiting**: Implement proper delays and respect quotas
+- **Error Handling**: Handle API errors gracefully with retries
+
+### OAuth 2.0 Implementation
+
+- Use `InstalledAppFlow` for local OAuth flow
+- Store credentials securely
+- Handle token refresh automatically
+- Use appropriate scopes: `https://www.googleapis.com/auth/youtube.force-ssl`
+
+## Coding Standards
+
+### Type Hints and Validation
+
+- Use strict type hints for all function parameters and returns
+- Use Pydantic Field descriptions for all model fields
+- Implement proper validation for URL parsing and API responses
+- Use Union types for optional parameters
+
+### Error Handling
+
+- Implement comprehensive error handling for API calls
+- Use proper exception types for different error scenarios
+- Log errors appropriately with structured logging
+- Provide meaningful error messages to users
+
+### Testing Strategy
+
+- Unit tests for individual methods and functions
+- Integration tests for API interactions
+- Mock external API calls in tests
+- Test error scenarios and edge cases
+- Maintain high test coverage (>80%)
+
+## Message Processing
+
+### Chat Message Structure
+
+```python
+# Expected message format from YouTube API
+{
+    "snippet": {"displayMessage": str, "authorChannelId": str, "publishedAt": str},
+    "authorDetails": {
+        "displayName": str,
+        "channelId": str,
+        "isChatOwner": bool,
+        "isChatModerator": bool,
+    },
+}
+```
+
+### Message Filtering and Processing
+
+- Implement message filtering logic for spam detection
+- Handle different message types (text, super chat, etc.)
+- Process user commands and triggers
+- Implement rate limiting for bot responses
+
+## Security Considerations
+
+### API Key Management
+
+- Never commit API keys or secrets to version control
+- Use environment variables for all sensitive data
+- Validate API keys on startup
+- Implement proper error handling for authentication failures
+
+### OAuth Security
+
+- Store OAuth tokens securely
+- Implement token refresh logic
+- Use minimal required scopes
+- Handle OAuth errors gracefully
+
+### Input Validation
+
+- Validate all user inputs (URLs, messages, commands)
+- Sanitize message content before sending
+- Implement proper URL parsing with error handling
+- Validate API responses before processing
+
+## Performance Optimization
+
+### API Usage Optimization
+
+- Implement efficient polling strategies
+- Use pagination for large chat histories
+- Cache frequently accessed data
+- Batch API requests where possible
+
+### Memory Management
+
+- Implement proper cleanup for long-running processes
+- Use generators for processing large datasets
+- Monitor memory usage during continuous operation
+- Implement proper connection handling
+
+## Future Development
+
+### Planned Features
+
+- AI-powered response generation using OpenAI API
+- Multi-language support for international audiences
+- Advanced message filtering and moderation
+- Analytics and reporting dashboard
+- Webhook support for real-time notifications
+
+### Extension Points
+
+- Plugin system for custom message handlers
+- Template system for automated responses
+- Database integration for persistent storage
+- Web interface for bot management
+
+## Development Workflow
+
+### Local Development
+
+1. Set up environment variables in `.env` file
+2. Install dependencies with `uv sync`
+3. Run tests with `make test`
+4. Format code with `make format`
+5. Generate documentation with `make gen-docs`
+
+### Testing Guidelines
+
+- Write tests for all new functionality
+- Mock external API calls
+- Test error scenarios
+- Maintain backwards compatibility
+- Use pytest fixtures for common setup
+
+### Code Review Checklist
+
+- Type hints are complete and accurate
+- Error handling is comprehensive
+- API usage follows best practices
+- Security considerations are addressed
+- Documentation is updated
+- Tests cover new functionality
