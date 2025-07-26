@@ -60,10 +60,10 @@ class YoutubeStream(Config):
     def reply_to_chat(self, message: str) -> None:
         live_chat_id = self.get_chat_id()
         flow = InstalledAppFlow.from_client_secrets_file(
-            client_secrets_file="client_secret.json",
+            client_secrets_file="./data/client_secret.json",
             scopes=["https://www.googleapis.com/auth/youtube.force-ssl"],
         )
-        credentials = flow.run_local_server(port=0)
+        credentials = flow.run_local_server(port=8080, open_browser=True)
 
         youtube = build(serviceName="youtube", version="v3", credentials=credentials)
 
@@ -80,8 +80,8 @@ class YoutubeStream(Config):
 
 
 def main() -> None:
-    youtube_stream = YoutubeStream(url="https://www.youtube.com/watch?v=cE4nBa0xjgc")
-    youtube_stream.get_chat_messages()
+    youtube_stream = YoutubeStream(url="https://www.youtube.com/watch?v=ZcwMYFBNqd8")
+    youtube_stream.reply_to_chat("測試")
 
 
 if __name__ == "__main__":
