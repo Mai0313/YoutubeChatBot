@@ -8,6 +8,7 @@ from rich.console import Console
 from pydantic_settings import BaseSettings
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from openai import OpenAI
 
 dotenv.load_dotenv()
 console = Console()
@@ -27,6 +28,12 @@ class YoutubeStream(Config):
         parsed_url = urlparse(url=self.url)
         video_id = parsed_url.query.split("=")[-1]
         return video_id
+
+    @computed_field
+    @property
+    def client(self) -> OpenAI:
+        client = OpenAI(api_key=self.openai_api_key)
+        return client
 
     def get_chat_id(self) -> str:
         youtube = build(
@@ -81,7 +88,7 @@ class YoutubeStream(Config):
 
 def main() -> None:
     youtube_stream = YoutubeStream(url="https://www.youtube.com/watch?v=ZcwMYFBNqd8")
-    youtube_stream.reply_to_chat("測試")
+    youtube_stream.reply_to_chat("潮主播是0")
 
 
 if __name__ == "__main__":
