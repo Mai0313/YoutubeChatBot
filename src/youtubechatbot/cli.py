@@ -1,6 +1,6 @@
-import time
 import pickle
 from pathlib import Path
+from functools import cached_property
 from urllib.parse import urlparse
 
 import dotenv
@@ -10,7 +10,7 @@ from rich.console import Console
 from pydantic_settings import BaseSettings
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from googleapiclient.discovery import Resource, build
 from google.auth.transport.requests import Request
 
 from youtubechatbot.typings.chat import LiveChatMessageItem, LiveChatMessageListResponse
@@ -40,6 +40,18 @@ class YoutubeStream(Config):
     def client(self) -> OpenAI:
         client = OpenAI(api_key=self.openai_api_key)
         return client
+
+    @computed_field
+    @cached_property
+    def youtube(self) -> Resource:
+        credentials = self.get_credentials()
+        youtube = build(
+            serviceName="youtube",
+            version="v3",
+            developerKey=self.youtube_data_api_key,
+            credentials=credentials,
+        )
+        return youtube
 
     def get_credentials(self) -> Credentials:
         token_file = Path("./data/token.pickle")
@@ -71,18 +83,17 @@ class YoutubeStream(Config):
 
     def get_oai_response(self, message: str) -> str:
         messages = [
-            {"role": "user", "content": "請幫我想一句話參與聊天"},
-            {"role": "user", "content": message},
+            {"role": "user", "content": f"Here is all chat history:\n{message}"},
+            {"role": "user", "content": "請假扮 Mai 代替他回應聊天室, 你只能回應一句話"},
         ]
-        response = self.client.chat.completions.create(messages=messages, model="gpt-4.1")
+        response = self.client.chat.completions.create(
+            messages=messages, model="gpt-4.1", max_tokens=50
+        )
         return response.choices[0].message.content
 
     def reply_to_chat(self, message: str) -> None:
         live_chat_id = self.get_chat_id()
-        credentials = self.get_credentials()
-
-        youtube = build(serviceName="youtube", version="v3", credentials=credentials)
-        live_message = youtube.liveChatMessages()
+        live_message = self.youtube.liveChatMessages()
 
         chat = live_message.insert(
             part="snippet",
@@ -99,35 +110,33 @@ class YoutubeStream(Config):
         console.print(f"📤 已發送: {message}")
 
     def get_chat_id(self) -> str:
-        youtube = build(
-            serviceName="youtube", version="v3", developerKey=self.youtube_data_api_key
-        )
-        video_list = youtube.videos().list(part="liveStreamingDetails", id=self.video_id)
-        response = VideoListResponse(**video_list.execute())
+        video_list = self.youtube.videos().list(part="liveStreamingDetails", id=self.video_id)
+        response_dict = video_list.execute()
+        response = VideoListResponse(**response_dict)
         chat_id = response.items[0].live_streaming_details.active_live_chat_id
         return chat_id
 
-    def get_chat_messages(self) -> None:
+    def get_chat_messages(self) -> str:
         live_chat_id = self.get_chat_id()
-        youtube = build(
-            serviceName="youtube", version="v3", developerKey=self.youtube_data_api_key
-        )
-        next_token = None
-        live_message = youtube.liveChatMessages()
+        live_message = self.youtube.liveChatMessages()
         live_messages = live_message.list(
-            liveChatId=live_chat_id, part="snippet,authorDetails", pageToken=next_token
+            liveChatId=live_chat_id, part="snippet,authorDetails", pageToken=None
         )
         response = LiveChatMessageListResponse(**live_messages.execute())
 
+        chat_history = ""
         for item in response.items:
             name = item.author_details.display_name
             message = item.snippet.display_message
-            console.print(f"{name}: {message}")
+            chat_history += f"{name}: {message}\n"
+        return chat_history
 
 
 def main() -> None:
-    youtube_stream = YoutubeStream(url="https://www.youtube.com/watch?v=ZcwMYFBNqd8")
-    youtube_stream.get_chat_messages()
+    youtube_stream = YoutubeStream(url="https://www.youtube.com/watch?v=AiuBogDGqYE")
+    message = youtube_stream.get_chat_messages()
+    response = youtube_stream.get_oai_response(message=message)
+    youtube_stream.reply_to_chat(message=response)
 
 
 if __name__ == "__main__":
