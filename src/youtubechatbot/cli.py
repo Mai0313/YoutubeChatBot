@@ -130,6 +130,7 @@ class YoutubeStream(BaseSettings):
 def main() -> None:
     yt = YoutubeStream(url="https://www.youtube.com/watch?v=wksD4rYTxLg")
     registered_accounts = yt.get_register("中")
+    console.print(registered_accounts)
     message = yt.get_chat_messages()
     client = OpenAI()
     response = client.chat.completions.create(
