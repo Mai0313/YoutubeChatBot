@@ -20,12 +20,8 @@ dotenv.load_dotenv()
 console = Console()
 
 
-class Config(BaseSettings):
-    youtube_data_api_key: str = Field(..., validation_alias="YOUTUBE_DATA_API_KEY")
-    openai_api_key: str = Field(..., validation_alias="OPENAI_API_KEY")
-
-
-class YoutubeStream(Config):
+class YoutubeStream(BaseSettings):
+    yt_api_key: str = Field(..., validation_alias="YOUTUBE_DATA_API_KEY", exclude=True)
     url: str
 
     @computed_field
@@ -36,19 +32,13 @@ class YoutubeStream(Config):
         return video_id
 
     @computed_field
-    @property
-    def client(self) -> OpenAI:
-        client = OpenAI(api_key=self.openai_api_key)
-        return client
-
-    @computed_field
     @cached_property
     def youtube(self) -> Resource:
         credentials = self.get_credentials()
         youtube = build(
             serviceName="youtube",
             version="v3",
-            developerKey=self.youtube_data_api_key,
+            developerKey=self.yt_api_key,
             credentials=credentials,
         )
         return youtube
@@ -80,16 +70,6 @@ class YoutubeStream(Config):
                 pickle.dump(credentials, token)
                 console.print("💾 憑證已保存")
         return credentials
-
-    def get_oai_response(self, message: str) -> str:
-        messages = [
-            {"role": "user", "content": f"Here is all chat history:\n{message}"},
-            {"role": "user", "content": "請假扮 Mai 代替他回應聊天室, 你只能回應一句話"},
-        ]
-        response = self.client.chat.completions.create(
-            messages=messages, model="gpt-4.1", max_tokens=50
-        )
-        return response.choices[0].message.content
 
     def reply_to_chat(self, message: str) -> None:
         live_chat_id = self.get_chat_id()
@@ -131,12 +111,35 @@ class YoutubeStream(Config):
             chat_history += f"{name}: {message}\n"
         return chat_history
 
+    def get_register(self, target_word: str) -> list[str]:
+        live_chat_id = self.get_chat_id()
+        live_message = self.youtube.liveChatMessages()
+        live_messages = live_message.list(
+            liveChatId=live_chat_id, part="snippet,authorDetails", pageToken=None
+        )
+        response = LiveChatMessageListResponse(**live_messages.execute())
+
+        registered_accounts = []
+        for item in response.items:
+            if target_word in item.snippet.display_message:
+                registered_accounts.append(item.author_details.display_name)
+        unique_accounts = list(set(registered_accounts))
+        return unique_accounts
+
 
 def main() -> None:
-    youtube_stream = YoutubeStream(url="https://www.youtube.com/watch?v=AiuBogDGqYE")
-    message = youtube_stream.get_chat_messages()
-    response = youtube_stream.get_oai_response(message=message)
-    youtube_stream.reply_to_chat(message=response)
+    yt = YoutubeStream(url="https://www.youtube.com/watch?v=wksD4rYTxLg")
+    registered_accounts = yt.get_register("中")
+    message = yt.get_chat_messages()
+    client = OpenAI()
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "user", "content": f"Here is all chat history:\n{message}"},
+            {"role": "user", "content": "你是 Mai 的助理 請代替他參與聊天"},
+        ],
+        model="gpt-4.1",
+    )
+    yt.reply_to_chat(message=response.choices[0].message.content)
 
 
 if __name__ == "__main__":
