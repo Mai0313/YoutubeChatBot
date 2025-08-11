@@ -21,7 +21,7 @@ Monitor YouTube live streams, analyze chat messages in real-time, and engage wit
 
 ## ✨ Features
 
-### � **Live Chat Monitoring**
+### 🟢 **Live Chat Monitoring**
 
 - **Real-time chat tracking**: Monitor YouTube live stream chat messages as they appear
 - **Multiple stream support**: Connect to different YouTube live streams
@@ -30,17 +30,17 @@ Monitor YouTube live streams, analyze chat messages in real-time, and engage wit
 
 ### 🤖 **Automated Response System**
 
-- **Smart replies**: Send automated responses to chat messages
+- **Smart replies (example)**: Example assistant in `youtubechatbot.cli` uses OpenAI to compose a reply and post it back
 - **OAuth authentication**: Secure authentication with YouTube API
-- **Custom message templates**: Create personalized response templates
-- **Rate limiting**: Respect YouTube API rate limits
+- **Custom logic**: Extend `YoutubeStream` to implement your own reply logic
+- **Rate limiting**: Respect YouTube API rate limits (add throttling in your loop)
 
-### � **Easy Configuration**
+### ⚙️ **Easy Configuration**
 
 - **Environment variables**: Simple setup with `.env` file
 - **YouTube Data API**: Integration with YouTube Data API v3
 - **OpenAI integration**: Ready for AI-powered responses (future feature)
-- **Command-line interface**: Easy-to-use CLI for quick setup
+- **CLI entry points**: `youtubechatbot` and `cli` invoke the example assistant
 
 ### 🛡️ **Modern Development**
 
@@ -75,17 +75,19 @@ Monitor YouTube live streams, analyze chat messages in real-time, and engage wit
 
 3. **Set up environment variables**:
 
-    ```bash
-    cp .env.example .env
-    # Edit .env file with your API keys
+    Create a `.env` file in the project root and add your keys:
+
+    ```env
+    YOUTUBE_DATA_API_KEY=your_youtube_data_api_key_here
+    OPENAI_API_KEY=your_openai_api_key_here  # optional
     ```
 
 4. **Configure OAuth (for sending messages)**:
 
     - Download `client_secret.json` from Google Cloud Console
-    - Place it in the project root directory
+    - Place it at `./data/client_secret.json` (create the `data/` folder if missing)
 
-### Basic Usage
+### Basic Usage (Library)
 
 #### Monitor Live Chat Messages
 
@@ -95,25 +97,26 @@ from youtubechatbot import YoutubeStream
 # Create a stream instance
 stream = YoutubeStream(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
 
-# Start monitoring chat messages
-stream.get_chat_messages()
+# Fetch a page of recent chat messages (typed)
+resp = stream.get_chat_messages()
+for item in resp.items:
+    author = item.author_details.display_name if item.author_details else "Unknown"
+    print(f"{author}: {item.snippet.display_message}")
 ```
 
-#### Send Messages to Chat
+#### Send a Message to Chat
 
 ```python
 # Reply to the chat
 stream.reply_to_chat("Hello everyone! 👋")
 ```
 
-#### Command Line Usage
+#### Command Line Usage (Example Assistant)
 
 ```bash
-# Monitor a specific live stream
-python -m youtubechatbot monitor --url "https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
+youtubechatbot  # runs the example assistant with the default URL inside `cli.py`
 
-# Send a message to the chat
-python -m youtubechatbot reply --url "https://www.youtube.com/watch?v=YOUR_VIDEO_ID" --message "Hello!"
+python -m youtubechatbot.cli  # equivalent
 ```
 
 ## 📁 Project Structure
@@ -156,7 +159,7 @@ OPENAI_API_KEY=your_openai_api_key_here  # Optional, for future AI features
 3. Enable YouTube Data API v3
 4. Create OAuth 2.0 credentials
 5. Download the JSON file and rename it to `client_secret.json`
-6. Place it in the project root directory
+6. Place it at `./data/client_secret.json` (create the `data/` folder if missing)
 
 ### API Rate Limits
 
@@ -180,9 +183,9 @@ make uv-install     # Install uv dependency manager
 uv add <package>    # Add production dependency
 uv add <package> --dev  # Add development dependency
 
-# Bot Usage
-python -m youtubechatbot monitor --url <youtube_url>     # Monitor chat
-python -m youtubechatbot reply --url <youtube_url> --message <text>  # Send message
+# Example Assistant
+youtubechatbot
+python -m youtubechatbot.cli
 ```
 
 ## 🔧 Advanced Usage
@@ -194,12 +197,16 @@ from youtubechatbot import YoutubeStream
 
 
 class CustomChatBot(YoutubeStream):
-    def process_message(self, author: str, message: str) -> None:
-        """Custom message processing logic"""
-        if "hello" in message.lower():
-            self.reply_to_chat(f"Hello {author}! 👋")
-        elif "help" in message.lower():
-            self.reply_to_chat("Available commands: !help, !info, !time")
+    def run_once(self) -> None:
+        page = self.get_chat_messages()
+        for line in page.splitlines():
+            if ":" not in line:
+                continue
+            author, message = line.split(":", 1)
+            if "hello" in message.lower():
+                self.reply_to_chat(f"Hello {author.strip()}! 👋")
+            elif "help" in message.lower():
+                self.reply_to_chat("Available commands: !help, !info, !time")
 
 
 # Use your custom bot
@@ -207,22 +214,18 @@ bot = CustomChatBot(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
 bot.get_chat_messages()
 ```
 
-### Integration with AI Services
+### Integration with AI Services (Example)
 
 ```python
-import openai
+from openai import OpenAI
 from youtubechatbot import YoutubeStream
 
 
 class AIChatBot(YoutubeStream):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        openai.api_key = self.openai_api_key
-
     def generate_ai_response(self, message: str) -> str:
-        """Generate AI response using OpenAI"""
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": message}]
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4.1", messages=[{"role": "user", "content": message}]
         )
         return response.choices[0].message.content
 ```
@@ -243,14 +246,14 @@ class AIChatBot(YoutubeStream):
 - **Educational content**: Answer student questions during live classes
 - **Community building**: Foster engagement in live communities
 
-## 📊 Monitoring and Analytics
+## 🔎 Keyword Registration Utility
 
-The bot provides real-time insights into your live chat:
+Use `get_registered_accounts(target_word)` to collect unique users who mentioned a keyword in the latest page of messages:
 
-- Message frequency and patterns
-- Active user engagement
-- Response rates to automated messages
-- Popular topics and keywords
+```python
+users = stream.get_registered_accounts(target_word="!join")
+print(users)
+```
 
 ## 🔒 Security and Privacy
 

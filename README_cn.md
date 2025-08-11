@@ -21,7 +21,7 @@
 
 ## ✨ 功能特色
 
-### � **即時聊天室監控**
+### 🟢 **即時聊天室監控**
 
 - **即時聊天追蹤**: 即時監控 YouTube 直播聊天室訊息
 - **多直播支援**: 連接到不同的 YouTube 直播串流
@@ -30,19 +30,19 @@
 
 ### 🤖 **自動回覆系統**
 
-- **智慧回覆**: 自動回覆聊天室訊息
+- **智慧回覆（示例）**: `youtubechatbot.cli` 中的示例助理使用 OpenAI 產生回覆並發送
 - **OAuth 驗證**: 與 YouTube API 的安全驗證
-- **自訂訊息模板**: 建立個人化的回覆模板
-- **速率限制**: 遵守 YouTube API 速率限制
+- **自訂邏輯**: 繼承 `YoutubeStream` 實作您自己的回覆邏輯
+- **速率限制**: 請在您的輪詢邏輯中加入節流以遵守 API 限制
 
-### � **簡易配置**
+### ⚙️ **簡易配置**
 
 - **環境變數**: 使用 `.env` 檔案進行簡單設定
 - **YouTube Data API**: 整合 YouTube Data API v3
 - **OpenAI 整合**: 為 AI 驅動的回覆做好準備（未來功能）
-- **命令列介面**: 易於使用的 CLI 快速設定
+- **CLI 入口**: `youtubechatbot` 與 `cli` 會啟動示例助理
 
-### �️ **現代化開發**
+### 🛡️ **現代化開發**
 
 - **類型安全**: 使用 Pydantic 模型的完整類型提示
 - **錯誤處理**: 強大的錯誤處理和日誌記錄
@@ -75,17 +75,19 @@
 
 3. **設定環境變數**:
 
-    ```bash
-    cp .env.example .env
-    # 編輯 .env 檔案，加入您的 API 金鑰
+    在專案根目錄建立 `.env` 並加入：
+
+    ```env
+    YOUTUBE_DATA_API_KEY=您的youtube_data_api金鑰
+    OPENAI_API_KEY=您的openai_api金鑰  # 可選
     ```
 
 4. **配置 OAuth（用於發送訊息）**:
 
     - 從 Google Cloud Console 下載 `client_secret.json`
-    - 將檔案放在專案根目錄
+    - 放置於 `./data/client_secret.json`（若無 `data/` 請自行建立）
 
-### 基本使用方式
+### 基本使用方式（函式庫）
 
 #### 監控直播聊天室訊息
 
@@ -95,8 +97,11 @@ from youtubechatbot import YoutubeStream
 # 建立串流實例
 stream = YoutubeStream(url="https://www.youtube.com/watch?v=您的影片ID")
 
-# 開始監控聊天室訊息
-stream.get_chat_messages()
+# 取得一頁最近的聊天室訊息（具型別）
+resp = stream.get_chat_messages()
+for item in resp.items:
+    author = item.author_details.display_name if item.author_details else "Unknown"
+    print(f"{author}: {item.snippet.display_message}")
 ```
 
 #### 發送訊息到聊天室
@@ -106,14 +111,12 @@ stream.get_chat_messages()
 stream.reply_to_chat("大家好！ 👋")
 ```
 
-#### 命令列使用方式
+#### 命令列使用方式（示例助理）
 
 ```bash
-# 監控特定直播串流
-python -m youtubechatbot monitor --url "https://www.youtube.com/watch?v=您的影片ID"
+youtubechatbot  # 執行 `cli.py` 內建的示例助理（使用預設 URL）
 
-# 發送訊息到聊天室
-python -m youtubechatbot reply --url "https://www.youtube.com/watch?v=您的影片ID" --message "哈囉！"
+python -m youtubechatbot.cli  # 等效
 ```
 
 ## 📁 專案結構
@@ -123,6 +126,8 @@ python -m youtubechatbot reply --url "https://www.youtube.com/watch?v=您的影�
 ├── .github/
 │   ├── workflows/          # CI/CD 工作流程
 │   └── copilot-instructions.md
+├── data/
+│   └── client_secret.json  # OAuth 憑證（不在儲存庫中）
 ├── docker/                 # Docker 配置
 ├── docs/                   # MkDocs 文檔
 ├── scripts/                # 自動化腳本
@@ -131,7 +136,6 @@ python -m youtubechatbot reply --url "https://www.youtube.com/watch?v=您的影�
 │       ├── __init__.py
 │       └── cli.py          # 核心機器人功能
 ├── tests/                  # 測試套件
-├── client_secret.json      # OAuth 憑證（不在儲存庫中）
 ├── .env                    # 環境變數（不在儲存庫中）
 ├── pyproject.toml          # 專案配置
 ├── Makefile               # 開發命令
@@ -156,7 +160,7 @@ OPENAI_API_KEY=您的openai_api金鑰  # 可選，用於未來的 AI 功能
 3. 啟用 YouTube Data API v3
 4. 建立 OAuth 2.0 憑證
 5. 下載 JSON 檔案並重新命名為 `client_secret.json`
-6. 將檔案放在專案根目錄
+6. 放置於 `./data/client_secret.json`（若無 `data/` 請自行建立）
 
 ### API 速率限制
 
@@ -180,9 +184,9 @@ make uv-install     # 安裝 uv 依賴管理器
 uv add <套件名稱>    # 添加生產依賴
 uv add <套件名稱> --dev  # 添加開發依賴
 
-# 機器人使用
-python -m youtubechatbot monitor --url <youtube網址>     # 監控聊天室
-python -m youtubechatbot reply --url <youtube網址> --message <訊息內容>  # 發送訊息
+# 示例助理
+youtubechatbot
+python -m youtubechatbot.cli
 ```
 
 ## 🔧 進階使用
@@ -194,12 +198,16 @@ from youtubechatbot import YoutubeStream
 
 
 class CustomChatBot(YoutubeStream):
-    def process_message(self, author: str, message: str) -> None:
-        """自訂訊息處理邏輯"""
-        if "你好" in message or "hello" in message.lower():
-            self.reply_to_chat(f"哈囉 {author}！ 👋")
-        elif "幫助" in message or "help" in message.lower():
-            self.reply_to_chat("可用指令：!help, !info, !time")
+    def run_once(self) -> None:
+        page = self.get_chat_messages()
+        for line in page.splitlines():
+            if ":" not in line:
+                continue
+            author, message = line.split(":", 1)
+            if "你好" in message or "hello" in message.lower():
+                self.reply_to_chat(f"哈囉 {author.strip()}！ 👋")
+            elif "幫助" in message or "help" in message.lower():
+                self.reply_to_chat("可用指令：!help, !info, !time")
 
 
 # 使用您的自訂機器人
@@ -207,22 +215,18 @@ bot = CustomChatBot(url="https://www.youtube.com/watch?v=您的影片ID")
 bot.get_chat_messages()
 ```
 
-### 與 AI 服務整合
+### 與 AI 服務整合（示例）
 
 ```python
-import openai
+from openai import OpenAI
 from youtubechatbot import YoutubeStream
 
 
 class AIChatBot(YoutubeStream):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        openai.api_key = self.openai_api_key
-
     def generate_ai_response(self, message: str) -> str:
-        """使用 OpenAI 產生 AI 回覆"""
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": message}]
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4.1", messages=[{"role": "user", "content": message}]
         )
         return response.choices[0].message.content
 ```
@@ -243,14 +247,14 @@ class AIChatBot(YoutubeStream):
 - **教育內容**: 在直播課程中回答學生問題
 - **社群建設**: 在直播社群中促進參與
 
-## 📊 監控與分析
+## 🔎 關鍵字登記工具
 
-機器人提供即時的直播聊天室洞察：
+使用 `get_registered_accounts(target_word)` 收集最近一頁訊息中有提及關鍵字的唯一用戶：
 
-- 訊息頻率和模式
-- 活躍用戶參與度
-- 自動訊息回應率
-- 熱門話題和關鍵字
+```python
+users = stream.get_registered_accounts(target_word="!join")
+print(users)
+```
 
 ## 🔒 安全性與隱私
 

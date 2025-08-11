@@ -95,29 +95,17 @@ class YoutubeStream(BaseSettings):
         chat_id = response.items[0].live_streaming_details.active_live_chat_id
         return chat_id
 
-    def get_chat_messages(self) -> str:
+    def get_chat_messages(self) -> LiveChatMessageListResponse:
         live_chat_id = self.get_chat_id()
         live_message = self.youtube.liveChatMessages()
         live_messages = live_message.list(
             liveChatId=live_chat_id, part="snippet,authorDetails", pageToken=None
         )
         response = LiveChatMessageListResponse(**live_messages.execute())
+        return response
 
-        chat_history = ""
-        for item in response.items:
-            name = item.author_details.display_name
-            message = item.snippet.display_message
-            chat_history += f"{name}: {message}\n"
-        return chat_history
-
-    def get_register(self, target_word: str) -> list[str]:
-        live_chat_id = self.get_chat_id()
-        live_message = self.youtube.liveChatMessages()
-        live_messages = live_message.list(
-            liveChatId=live_chat_id, part="snippet,authorDetails", pageToken=None
-        )
-        response = LiveChatMessageListResponse(**live_messages.execute())
-
+    def get_registered_accounts(self, target_word: str) -> list[str]:
+        response = self.get_chat_messages()
         registered_accounts = []
         for item in response.items:
             if target_word in item.snippet.display_message:

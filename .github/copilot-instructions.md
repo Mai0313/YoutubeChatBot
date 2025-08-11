@@ -18,22 +18,24 @@ The main functionality includes:
 
 ## Main Components
 
-### `YoutubeStream` Class (`src/youtubechatbot/cli.py`)
+### `YoutubeStream` Class (`src/youtubechatbot/__init__.py`)
 
 - **Purpose**: Main class handling YouTube live stream chat operations
-- **Inherits from**: `Config` (Pydantic BaseSettings)
+- **Inherits from**: `BaseSettings` (Pydantic Settings)
 - **Key Methods**:
-    - `video_id`: Computed property to extract video ID from URL
-    - `get_chat_id()`: Retrieves the live chat ID from video
-    - `get_chat_messages()`: Continuously monitors chat messages
-    - `reply_to_chat(message: str)`: Sends messages to the chat
+    - `video_id` (computed): Extracts the video ID from a standard YouTube watch URL
+    - `get_credentials()`: Handles local OAuth flow and token persistence
+    - `get_chat_id()`: Retrieves the active live chat ID for the video
+    - `get_chat_messages() -> LiveChatMessageListResponse`: Fetches a single page of recent chat messages (not a continuous monitor)
+    - `reply_to_chat(message: str)`: Sends a text message to the live chat
+    - `get_registered_accounts(target_word: str) -> list[str]`: Returns unique display names of users who mentioned a specific keyword in recent messages
 
 ### Configuration Management
 
 - Uses Pydantic `BaseSettings` for environment variable management
 - Required environment variables:
-    - `YOUTUBE_DATA_API_KEY`: YouTube Data API v3 key
-    - `OPENAI_API_KEY`: OpenAI API key (for future AI features)
+    - `YOUTUBE_DATA_API_KEY`: YouTube Data API v3 key (required)
+    - `OPENAI_API_KEY`: OpenAI API key (optional; required only for the sample assistant in `cli.py`)
 
 ## Dependencies
 
@@ -79,17 +81,19 @@ src/youtubechatbot/
 - **Authentication**: API key for read operations, OAuth for write operations
 - **Endpoints Used**:
     - `videos().list()`: Get live streaming details
-    - `liveChatMessages().list()`: Retrieve chat messages
+    - `liveChatMessages().list()`: Retrieve chat messages (single page as `LiveChatMessageListResponse`)
     - `liveChatMessages().insert()`: Send chat messages
-- **Rate Limiting**: Implement proper delays and respect quotas
+- **Rate Limiting**: No built-in throttling yet; callers should add delays and respect quotas
 - **Error Handling**: Handle API errors gracefully with retries
 
 ### OAuth 2.0 Implementation
 
 - Use `InstalledAppFlow` for local OAuth flow
-- Store credentials securely
+- Store credentials and tokens under `./data/`
+    - Client secrets: `./data/client_secret.json`
+    - Cached token: `./data/token.pickle`
 - Handle token refresh automatically
-- Use appropriate scopes: `https://www.googleapis.com/auth/youtube.force-ssl`
+- Scope used: `https://www.googleapis.com/auth/youtube.force-ssl`
 
 ## Coding Standards
 
@@ -132,12 +136,11 @@ src/youtubechatbot/
 }
 ```
 
-### Message Filtering and Processing
+### Message Retrieval and Processing
 
-- Implement message filtering logic for spam detection
-- Handle different message types (text, super chat, etc.)
-- Process user commands and triggers
-- Implement rate limiting for bot responses
+- Current implementation fetches one page of recent messages
+- Example helper `get_register(target_word)` finds users who mentioned a keyword
+- Future work: spam filtering, message type handling (super chat, etc.), command processing, response rate limiting
 
 ## Security Considerations
 
@@ -200,10 +203,11 @@ src/youtubechatbot/
 ### Local Development
 
 1. Set up environment variables in `.env` file
-2. Install dependencies with `uv sync`
-3. Run tests with `make test`
-4. Format code with `make format`
-5. Generate documentation with `make gen-docs`
+2. Place `client_secret.json` at `./data/client_secret.json` (create the `data/` folder if missing)
+3. Install dependencies with `uv sync`
+4. Run tests with `make test`
+5. Format code with `make format`
+6. Generate documentation with `make gen-docs`
 
 ### Testing Guidelines
 
@@ -212,6 +216,17 @@ src/youtubechatbot/
 - Test error scenarios
 - Maintain backwards compatibility
 - Use pytest fixtures for common setup
+
+## CLI and Example Assistant
+
+### Entry Points
+
+- `youtubechatbot` and `cli` map to `youtubechatbot.cli:main`
+- The example assistant:
+    - Fetches recent chat messages via `YoutubeStream.get_chat_messages()`
+    - Generates a reply using OpenAI `chat.completions` (model: `gpt-4.1`)
+    - Sends the reply with `YoutubeStream.reply_to_chat()`
+- Note: The current CLI does not parse command-line options; pass a URL by calling `main(url=...)` or use the library API directly.
 
 ### Code Review Checklist
 
