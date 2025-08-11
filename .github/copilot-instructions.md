@@ -23,10 +23,10 @@ The main functionality includes:
 - **Purpose**: Main class handling YouTube live stream chat operations
 - **Inherits from**: `BaseSettings` (Pydantic Settings)
 - **Key Methods**:
-    - `video_id` (computed): Extracts the video ID from a standard YouTube watch URL
-    - `get_credentials()`: Handles local OAuth flow and token persistence
-    - `get_chat_id()`: Retrieves the active live chat ID for the video
-    - `get_chat_messages() -> LiveChatMessageListResponse`: Fetches a single page of recent chat messages (not a continuous monitor)
+    - `_get_credentials() -> Credentials` (classmethod): Handles local OAuth flow and token persistence under `./data/`
+    - `youtube` (computed): Authenticated YouTube Data API v3 client
+    - `get_chat_id() -> str`: Parses the video ID from `url` and retrieves the active live chat ID
+    - `get_chat_messages() -> str`: Returns a single-page chat history string with lines formatted as `"<Name>: <Message>\n"`
     - `reply_to_chat(message: str)`: Sends a text message to the live chat
     - `get_registered_accounts(target_word: str) -> list[str]`: Returns unique display names of users who mentioned a specific keyword in recent messages
 
@@ -81,7 +81,7 @@ src/youtubechatbot/
 - **Authentication**: API key for read operations, OAuth for write operations
 - **Endpoints Used**:
     - `videos().list()`: Get live streaming details
-    - `liveChatMessages().list()`: Retrieve chat messages (single page as `LiveChatMessageListResponse`)
+    - `liveChatMessages().list()`: Retrieve chat messages (single page; mapped internally to `LiveChatMessageListResponse` but exposed via a string helper)
     - `liveChatMessages().insert()`: Send chat messages
 - **Rate Limiting**: No built-in throttling yet; callers should add delays and respect quotas
 - **Error Handling**: Handle API errors gracefully with retries
@@ -139,7 +139,7 @@ src/youtubechatbot/
 ### Message Retrieval and Processing
 
 - Current implementation fetches one page of recent messages
-- Example helper `get_register(target_word)` finds users who mentioned a keyword
+- Helper `get_registered_accounts(target_word)` finds users who mentioned a keyword
 - Future work: spam filtering, message type handling (super chat, etc.), command processing, response rate limiting
 
 ## Security Considerations
@@ -223,7 +223,7 @@ src/youtubechatbot/
 
 - `youtubechatbot` and `cli` map to `youtubechatbot.cli:main`
 - The example assistant:
-    - Fetches recent chat messages via `YoutubeStream.get_chat_messages()`
+    - Fetches recent chat history (string) via `YoutubeStream.get_chat_messages()`
     - Generates a reply using OpenAI `chat.completions` (model: `gpt-4.1`)
     - Sends the reply with `YoutubeStream.reply_to_chat()`
 - Note: The current CLI does not parse command-line options; pass a URL by calling `main(url=...)` or use the library API directly.

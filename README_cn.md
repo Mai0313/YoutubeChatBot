@@ -97,11 +97,9 @@ from youtubechatbot import YoutubeStream
 # 建立串流實例
 stream = YoutubeStream(url="https://www.youtube.com/watch?v=您的影片ID")
 
-# 取得一頁最近的聊天室訊息（具型別）
-resp = stream.get_chat_messages()
-for item in resp.items:
-    author = item.author_details.display_name if item.author_details else "Unknown"
-    print(f"{author}: {item.snippet.display_message}")
+# 取得一頁最近的聊天室訊息（整段字串）
+chat_history = stream.get_chat_messages()
+print(chat_history)
 ```
 
 #### 發送訊息到聊天室

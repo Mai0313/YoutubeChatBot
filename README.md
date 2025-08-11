@@ -97,11 +97,9 @@ from youtubechatbot import YoutubeStream
 # Create a stream instance
 stream = YoutubeStream(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
 
-# Fetch a page of recent chat messages (typed)
-resp = stream.get_chat_messages()
-for item in resp.items:
-    author = item.author_details.display_name if item.author_details else "Unknown"
-    print(f"{author}: {item.snippet.display_message}")
+# Fetch a page of recent chat messages as a single string
+chat_history = stream.get_chat_messages()
+print(chat_history)
 ```
 
 #### Send a Message to Chat
