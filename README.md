@@ -130,7 +130,9 @@ python -m youtubechatbot.cli  # equivalent
 ├── src/
 │   └── youtubechatbot/     # Main bot package
 │       ├── __init__.py
-│       └── cli.py          # Core bot functionality
+│       ├── cli.py          # Core bot functionality
+│       └── typings/
+│           └── models.py   # Consolidated Pydantic models for chat and stream
 ├── tests/                  # Test suite
 ├── client_secret.json      # OAuth credentials (not in repo)
 ├── .env                    # Environment variables (not in repo)

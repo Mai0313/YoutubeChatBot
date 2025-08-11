@@ -12,8 +12,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import Resource, build
 from google.auth.transport.requests import Request
 
-from youtubechatbot.typings.chat import LiveChatMessageItem, LiveChatMessageListResponse
-from youtubechatbot.typings.stream import VideoListResponse
+from youtubechatbot.typings.models import (
+    LiveChatMessageItem,
+    LiveChatMessageListResponse,
+    VideoListResponse,
+)
 
 dotenv.load_dotenv()
 console = Console()

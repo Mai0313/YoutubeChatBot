@@ -132,7 +132,9 @@ python -m youtubechatbot.cli  # 等效
 ├── src/
 │   └── youtubechatbot/     # 主要機器人套件
 │       ├── __init__.py
-│       └── cli.py          # 核心機器人功能
+│       ├── cli.py          # 核心機器人功能
+│       └── typings/
+│           └── models.py   # 聊天與直播的 Pydantic 模型整合檔
 ├── tests/                  # 測試套件
 ├── .env                    # 環境變數（不在儲存庫中）
 ├── pyproject.toml          # 專案配置

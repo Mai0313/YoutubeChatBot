@@ -63,8 +63,10 @@ The main functionality includes:
 
 ```
 src/youtubechatbot/
-├── __init__.py          # Package initialization
-└── cli.py              # Main bot functionality and CLI
+├── __init__.py                # Package initialization
+├── cli.py                    # Main bot functionality and CLI
+└── typings/
+    └── models.py             # Consolidated Pydantic models for chat and stream
 ```
 
 ### Class Design Patterns
@@ -81,7 +83,7 @@ src/youtubechatbot/
 - **Authentication**: API key for read operations, OAuth for write operations
 - **Endpoints Used**:
     - `videos().list()`: Get live streaming details
-    - `liveChatMessages().list()`: Retrieve chat messages (single page; mapped internally to `LiveChatMessageListResponse` but exposed via a string helper)
+- `liveChatMessages().list()`: Retrieve chat messages (single page; mapped to `LiveChatMessageListResponse` in `youtubechatbot.typings.models` but exposed via a string helper)
     - `liveChatMessages().insert()`: Send chat messages
 - **Rate Limiting**: No built-in throttling yet; callers should add delays and respect quotas
 - **Error Handling**: Handle API errors gracefully with retries
@@ -101,6 +103,7 @@ src/youtubechatbot/
 
 - Use strict type hints for all function parameters and returns
 - Use Pydantic Field descriptions for all model fields
+- All models are consolidated in `src/youtubechatbot/typings/models.py`. Remove or avoid using old module paths like `youtubechatbot.typings.chat` or `youtubechatbot.typings.stream` and import from `youtubechatbot.typings.models` instead.
 - Implement proper validation for URL parsing and API responses
 - Use Union types for optional parameters
 
