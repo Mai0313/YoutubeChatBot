@@ -27,6 +27,8 @@ The main functionality includes:
     - `youtube` (computed): Authenticated YouTube Data API v3 client
     - `get_chat_id() -> str`: Parses the video ID from `url` and retrieves the active live chat ID
     - `get_chat_messages() -> str`: Returns a single-page chat history string with lines formatted as `"<Name>: <Message>\n"`
+    - `iter_chat_messages_no_auth(inactivity_timeout: float = 0.1, headers: dict[str, str] | None = None) -> Generator[str, None, None]`: Yield chat messages without using the YouTube Data API (via `chat-downloader`). Each yielded line is formatted as `"<Name>: <Message>"`.
+    - `get_chat_messages_no_auth(inactivity_timeout: float = 0.1, headers: dict[str, str] | None = None, max_messages: int | None = 200) -> str`: Fetch a batch of messages using `iter_chat_messages_no_auth` and return as a single string.
     - `reply_to_chat(message: str)`: Sends a text message to the live chat
     - `get_registered_accounts(target_word: str) -> list[str]`: Returns unique display names of users who mentioned a specific keyword in recent messages
 
@@ -47,6 +49,7 @@ The main functionality includes:
 - **pydantic-settings**: Settings management from environment variables
 - **rich**: Console output formatting
 - **python-dotenv**: Environment variable loading
+- **chat-downloader**: Optional; enables no-auth read-only chat retrieval
 
 ### Development Dependencies
 
@@ -87,6 +90,13 @@ src/youtubechatbot/
     - `liveChatMessages().insert()`: Send chat messages
 - **Rate Limiting**: No built-in throttling yet; callers should add delays and respect quotas
 - **Error Handling**: Handle API errors gracefully with retries
+
+### No-Auth Read-Only Mode
+
+- Implemented via `chat-downloader` with a lazy import to avoid hard dependency when unused
+- Methods: `iter_chat_messages_no_auth`, `get_chat_messages_no_auth`
+- Advantages: Does not require API key or OAuth; useful for quick, read-only scraping
+- Limitations: Cannot send chat messages; stability may vary with YouTube site changes
 
 ### OAuth 2.0 Implementation
 

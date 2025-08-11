@@ -27,6 +27,7 @@ Monitor YouTube live streams, analyze chat messages in real-time, and engage wit
 - **Multiple stream support**: Connect to different YouTube live streams
 - **Message filtering**: Filter and process specific types of messages
 - **Author identification**: Track message authors and their details
+- **No-auth read-only mode (new)**: Fetch chat messages without an API key using ChatDownloader
 
 ### 🤖 **Automated Response System**
 
@@ -73,6 +74,12 @@ Monitor YouTube live streams, analyze chat messages in real-time, and engage wit
     uv sync          # Install project dependencies
     ```
 
+    Optional dependency for no-auth chat retrieval:
+
+    ```bash
+    uv add chat-downloader
+    ```
+
 3. **Set up environment variables**:
 
     Create a `.env` file in the project root and add your keys:
@@ -101,6 +108,28 @@ stream = YoutubeStream(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
 chat_history = stream.get_chat_messages()
 print(chat_history)
 ```
+
+#### Read-only, no-auth chat retrieval (no API key required)
+
+```python
+from youtubechatbot import YoutubeStream
+
+stream = YoutubeStream(url="https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
+
+# 1) Collect a batch into a single string (stops on inactivity or max_messages)
+page = stream.get_chat_messages_no_auth(inactivity_timeout=0.5, max_messages=200)
+print(page)
+
+# 2) Or stream messages as they arrive
+for line in stream.iter_chat_messages_no_auth(inactivity_timeout=1.0):
+    print(line)  # e.g. "Alice: Hello!"
+```
+
+Notes:
+
+- This mode uses `chat-downloader` and does not require an API key or OAuth.
+- It is read-only and cannot send messages.
+- Availability and stability may vary depending on YouTube changes.
 
 #### Send a Message to Chat
 
@@ -164,8 +193,9 @@ OPENAI_API_KEY=your_openai_api_key_here  # Optional, for future AI features
 ### API Rate Limits
 
 - **YouTube Data API**: 10,000 units per day (default)
-- **Chat messages**: ~1 unit per message retrieved
-- **Sending messages**: ~50 units per message sent
+- **Chat messages (API mode)**: ~1 unit per message retrieved
+- **Sending messages (API mode)**: ~50 units per message sent
+- **No-auth mode**: Does not use API quota but is read-only and relies on web retrieval
 
 Monitor your usage in Google Cloud Console to avoid hitting limits.
 
